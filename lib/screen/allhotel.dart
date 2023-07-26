@@ -96,7 +96,7 @@ class _AllHotelsState extends State<AllHotels> {
                 }
                 final hotel = hotelData[index];
                 final hotelId = int.parse(hotel["id"]);
-                final price = snapshot.data!;
+                // final price = snapshot.data!;
                 String priceforroom = '';
                 // final hotelprice = await gethotelPrice(hotelId);
                 // print(hotelprice);
