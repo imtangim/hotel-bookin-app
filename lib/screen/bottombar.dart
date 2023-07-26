@@ -27,11 +27,15 @@ class _BottombarState extends State<Bottombar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.white,
       body: Center(
         child: _widgetOptions[_selectedIndex],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: Colors.transparent,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -40,7 +44,7 @@ class _BottombarState extends State<Bottombar> {
             )
           ],
         ),
-        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30),
           child: BottomNavigationBar(
@@ -49,8 +53,8 @@ class _BottombarState extends State<Bottombar> {
                 _selectedIndex, //telling the flutter on which index we should have been right now
             onTap: _onItemTapped, //what would happen on tap
             elevation: 10,
-            showSelectedLabels: false, //hiding text
-            showUnselectedLabels: false, //hiding text
+            // showSelectedLabels: false, //hiding text
+            // showUnselectedLabels: false, //hiding text
             selectedItemColor:
                 Colors.blueGrey, //what would be the color of selectedItem
             unselectedItemColor: const Color(

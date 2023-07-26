@@ -54,7 +54,11 @@ Future<Map<String, dynamic>> gethotelPrice(int hotelid) async {
     );
 
     final hoteldata = jsonDecode(response2.body);
-    return hoteldata;
+    if (hoteldata != null) {
+      return hoteldata;
+    } else {
+      return {};
+    }
   } on Exception catch (e) {
     print('Error: $e');
     throw e.toString();
