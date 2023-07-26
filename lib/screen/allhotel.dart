@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:hotel_app/screen/homescreen.dart';
 import 'package:hotel_app/screen/hotelsscreen.dart';
 import 'package:hotel_app/utils/appstyles.dart';
 import 'package:intl/intl.dart';
