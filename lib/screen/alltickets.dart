@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screen/ticketcard.dart';
 import 'package:hotel_app/utils/appstyles.dart';
+import 'package:hotel_app/utils/tickets.dart';
 
 class AllTickets extends StatelessWidget {
   const AllTickets({super.key});
@@ -15,15 +16,12 @@ class AllTickets extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: 30,
-            itemBuilder: (context, index) {
-              return const TicketCard();
-            },
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Center(
+          child: Column(
+            children:
+                ticketList.map((hotel) => TicketCard(ticket: hotel)).toList(),
           ),
         ),
       ),

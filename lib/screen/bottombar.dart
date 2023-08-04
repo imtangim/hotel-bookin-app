@@ -2,6 +2,8 @@ import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screen/homescreen.dart';
 
+import 'search_screen.dart';
+
 class Bottombar extends StatefulWidget {
   const Bottombar({super.key});
 
@@ -10,10 +12,10 @@ class Bottombar extends StatefulWidget {
 }
 
 class _BottombarState extends State<Bottombar> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const Text("Search"),
+    const SearchScreen(),
     const Text("Tickets"),
     const Text("Profile")
   ];

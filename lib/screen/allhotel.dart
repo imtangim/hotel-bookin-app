@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:hotel_app/utils/applayout.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screen/hotelsscreen.dart';
@@ -13,28 +14,10 @@ class AllHotels extends StatefulWidget {
   State<AllHotels> createState() => _AllHotelsState();
 }
 
-Future<Map<String, dynamic>> gethoteldata() async {
-  try {
-    // print("$lat $long");
-    final response1 = await http.get(
-      Uri.parse(
-          "https://engine.hotellook.com/api/v2/lookup.json?query=Dhaka&lang=en&lookFor=both&limit=20"),
-    );
-    final hoteldata = jsonDecode(response1.body);
-    if (hoteldata['status'] == "ok") {
-      return hoteldata;
-    } else {
-      return {};
-    }
-  } on Exception catch (e) {
-    throw e.toString();
-  }
-}
-
 Future<Map<String, dynamic>> gethotelPrice(int hotelid) async {
   try {
     // Get the current date
-    DateTime currentDate = new DateTime.now();
+    DateTime currentDate = DateTime.now();
     String date = currentDate.toString().substring(0, 10);
 
     // Get tomorrow's date
@@ -57,7 +40,6 @@ Future<Map<String, dynamic>> gethotelPrice(int hotelid) async {
       return {};
     }
   } on Exception catch (e) {
-    print('Error: $e');
     throw e.toString();
   }
 }
@@ -69,75 +51,68 @@ class _AllHotelsState extends State<AllHotels> {
     final int hotelDataLength = hotelData.length;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Hotels",
-          style: Styles.headlineStyle1.copyWith(fontSize: 22),
+        appBar: AppBar(
+          title: Text(
+            "Hotels",
+            style: Styles.headlineStyle1.copyWith(fontSize: 22),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: hotelDataLength,
-          itemBuilder: (context, index) {
-            return FutureBuilder(
-              future: gethoteldata(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(snapshot.error.toString()),
-                  );
-                }
-                final hotel = hotelData[index];
-                final hotelId = int.parse(hotel["id"]);
-                // final price = snapshot.data!;
-                String priceforroom = '';
-                // final hotelprice = await gethotelPrice(hotelId);
-                // print(hotelprice);
-
-                return FutureBuilder(
-                  future: gethotelPrice(hotelId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text(snapshot.error.toString()),
-                      );
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // 2 items per row
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 40.0,
+                childAspectRatio: 0.60),
+            itemCount: hotelDataLength,
+            itemBuilder: (context, index) {
+              final hotel = hotelData[index];
+              final hotelId = int.parse(hotel["id"]);
+              // final price = snapshot.data!;
+              String priceforroom = '';
+              // final hotelprice = await gethotelPrice(hotelId);
+              // print(hotelprice);
+              return FutureBuilder(
+                future: gethotelPrice(hotelId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text(snapshot.error.toString()),
+                    );
+                  }
+                  final price = snapshot.data;
+                  if (price != null) {
+                    if (price["priceAvg"] != null) {
+                      priceforroom =
+                          "\$${price["priceAvg"].toString()}/per Day";
+                    } else {
+                      priceforroom = 'No Available';
                     }
-                    final price = snapshot.data;
-                    if (price != null) {
-                      if (price["priceAvg"] != null) {
-                        priceforroom =
-                            "\$${price["priceAvg"].toString()}/per Day";
-                      } else {
-                        priceforroom = 'No Available';
-                      }
-                    }
+                  }
 
-                    return Container(
-                      margin: const EdgeInsets.only(left: 16, right: 3),
+                  return AspectRatio(
+                    aspectRatio: 1,
+                    child: SizedBox(
+                      height: 400,
                       child: HotelScreen(
                         city: hotel['locationName'],
                         price: priceforroom,
                         hotelId: hotelId,
                         hotelName: hotel['fullName'],
+                        imageSize: 150,
                       ),
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ));
   }
 }

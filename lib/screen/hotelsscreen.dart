@@ -8,12 +8,14 @@ class HotelScreen extends StatelessWidget {
   final String hotelName;
   final String price;
   final int hotelId;
+  final int imageSize;
   const HotelScreen(
       {super.key,
       required this.city,
       required this.price,
       required this.hotelName,
-      required this.hotelId});
+      required this.hotelId,
+      required this.imageSize});
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +35,18 @@ class HotelScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
       margin: const EdgeInsets.only(top: 5, bottom: 3),
       width: size.width * 0.6,
-      height: 350,
+      height: AppLayout.getHeight(350),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 180,
+            height: AppLayout.getHeight(imageSize.ceilToDouble()),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppLayout.getHeight(12)),
               color: Styles.primaryColor,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppLayout.getHeight(12)),
               child: Image.network(
                 'https://photo.hotellook.com/image_v2/limit/h$hotelId/800/520.auto',
                 fit: BoxFit.cover,

@@ -1,5 +1,8 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:hotel_app/utils/applayout.dart';
+import 'package:hotel_app/utils/tickets.dart';
+import 'package:hotel_app/widgets/viewall.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:gap/gap.dart';
@@ -38,7 +41,7 @@ Future<Map<String, dynamic>> gethoteldata() async {
 Future<Map<String, dynamic>> gethotelPrice(int hotelid) async {
   try {
     // Get the current date
-    DateTime currentDate = new DateTime.now();
+    DateTime currentDate = DateTime.now();
     String date = currentDate.toString().substring(0, 10);
 
     // Get tomorrow's date
@@ -60,7 +63,6 @@ Future<Map<String, dynamic>> gethotelPrice(int hotelid) async {
       return {};
     }
   } on Exception catch (e) {
-    print('Error: $e');
     throw e.toString();
   }
 }
@@ -161,100 +163,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const Gap(40),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Upcoming Flights",
-                          style: Styles.headlineStyle2,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return const AllTickets();
-                                },
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "View All",
-                            style: Styles.textStyle
-                                .copyWith(color: Styles.primaryColor),
-                          ),
-                        ),
-                      ],
-                    )
+                    ViewAll(
+                        bigText: "Upcoming Flights",
+                        viewAll: "View All",
+                        destinationBuilder: (context) => const AllTickets())
                   ],
                 ),
               ),
               const Gap(15),
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.only(left: 16, right: 7),
-                      child: const TicketCard(),
-                    );
-                  },
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: ticketList
+                      .map((hotel) => TicketCard(ticket: hotel))
+                      .toList(),
                 ),
               ),
               const Gap(15),
-              FutureBuilder(
-                future: gethoteldata(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(snapshot.error.toString()),
-                    );
-                  }
-                  final hoteldata = snapshot.data!;
-
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Hotels",
-                          style: Styles.headlineStyle2,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return AllHotels(
-                                    data: hoteldata,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "View All",
-                            style: Styles.textStyle
-                                .copyWith(color: Styles.primaryColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ViewAll(
+                    bigText: "Hotels",
+                    viewAll: "View All",
+                    destinationBuilder: (context) => AllHotels(data: data)),
               ),
               const Gap(15),
               SizedBox(
-                height: 350,
+                height: AppLayout.getHeight(325),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: 4,
@@ -262,32 +198,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     final hotel = hotelData[index];
                     final hotelId = int.parse(hotel["id"]);
 
-                    return FutureBuilder(
-                        future: gethotelPrice(hotelId),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text(snapshot.error.toString()),
-                            );
-                          }
-                          final price = snapshot.data!;
-                          final averagePrice = price["priceAvg"].toString();
+                    return SizedBox(
+                      width: AppLayout.getwidth(250),
+                      child: FutureBuilder(
+                          future: gethotelPrice(hotelId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text(snapshot.error.toString()),
+                              );
+                            }
+                            final price = snapshot.data!;
+                            final averagePrice = price["priceAvg"].toString();
 
-                          return Container(
-                            margin: const EdgeInsets.only(left: 16, right: 3),
-                            child: HotelScreen(
-                              city: hotel['locationName'],
-                              price: "\$$averagePrice/per Day",
-                              hotelId: hotelId,
-                              hotelName: hotel['fullName'],
-                            ),
-                          );
-                        });
+                            return Container(
+                              margin: const EdgeInsets.only(left: 16, right: 3),
+                              child: HotelScreen(
+                                city: hotel['locationName'],
+                                price: "\$$averagePrice/per Day",
+                                hotelId: hotelId,
+                                hotelName: hotel['fullName'],
+                                imageSize: 180,
+                              ),
+                            );
+                          }),
+                    );
                   },
                 ),
               ),
